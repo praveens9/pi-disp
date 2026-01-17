@@ -18,28 +18,29 @@ from datetime import datetime
 from typing import List, Dict, Set
 
 
-# Curated list of feeds to import (15 total)
+# Curated list of feeds to import (15 total - FULL CONTENT ONLY)
+# These feeds provide complete articles in RSS, not just summaries
 CURATED_FEEDS = {
-    "Tech": [
-        {"title": "TechCrunch", "xmlUrl": "http://feeds.feedburner.com/Techcrunch"},
-        {"title": "Hacker News", "xmlUrl": "http://news.ycombinator.com/rss"},
-        {"title": "Wired", "xmlUrl": "http://feeds.wired.com/wired/index"},
-        {"title": "The Next Web", "xmlUrl": "http://feeds2.feedburner.com/thenextweb"},
-        {"title": "The Official Google Blog", "xmlUrl": "http://googleblog.blogspot.com/atom.xml"},
-        {"title": "Lifehacker", "xmlUrl": "http://feeds.gawker.com/lifehacker/vip"},
-        {"title": "Technology | The Atlantic", "xmlUrl": "http://feeds.feedburner.com/AtlanticScienceAndTechnology"},
+    "Programming": [
+        {"title": "Coding Horror", "xmlUrl": "https://feeds.feedburner.com/codinghorror"},
+        {"title": "Joel on Software", "xmlUrl": "https://www.joelonsoftware.com/feed/"},
+        {"title": "Dan Abramov's Overreacted", "xmlUrl": "https://overreacted.io/rss.xml"},
+        {"title": "Simon Willison's Weblog", "xmlUrl": "http://feeds.simonwillison.net/swn-everything"},
+        {"title": "Martin Fowler", "xmlUrl": "https://martinfowler.com/feed.atom"},
     ],
-    "Distributed": [
-        {"title": "Netflix TechBlog", "xmlUrl": "http://techblog.netflix.com/feeds/posts/default"},
-        {"title": "High Scalability", "xmlUrl": "http://feeds.feedburner.com/HighScalability"},
-        {"title": "The New Stack", "xmlUrl": "https://thenewstack.io/feed/"},
-        {"title": "All Things Distributed", "xmlUrl": "http://www.allthingsdistributed.com/atom.xml"},
-        {"title": "Kubernetes", "xmlUrl": "http://kubernetesio.blogspot.com/feeds/posts/default"},
-    ],
-    "Read": [
+    "JavaSpring": [
         {"title": "Baeldung", "xmlUrl": "http://feeds.feedburner.com/Baeldung"},
-        {"title": "The JetBrains Blog", "xmlUrl": "http://blog.jetbrains.com/feed/"},
-        {"title": "InfoQ - Java - Articles", "xmlUrl": "http://www.infoq.com/feed/java/articles"},
+        {"title": "Spring Framework Guru", "xmlUrl": "https://springframework.guru/feed/"},
+        {"title": "Java, SQL and jOOQ", "xmlUrl": "https://blog.jooq.org/feed"},
+        {"title": "Spring News", "xmlUrl": "http://spring.io/blog/category/news.atom"},
+    ],
+    "Engineering": [
+        {"title": "Netflix TechBlog", "xmlUrl": "https://netflixtechblog.com/feed"},
+        {"title": "Engineering at Slack", "xmlUrl": "https://slack.engineering/feed"},
+        {"title": "Code as Craft (Etsy)", "xmlUrl": "https://codeascraft.com/feed/atom/"},
+        {"title": "GitLab Blog", "xmlUrl": "https://about.gitlab.com/atom.xml"},
+        {"title": "LinkedIn Engineering", "xmlUrl": "https://engineering.linkedin.com/blog.rss.html"},
+        {"title": "Facebook Engineering", "xmlUrl": "https://engineering.fb.com/feed/"},
     ]
 }
 
@@ -187,7 +188,7 @@ class FeedlyImporter:
 
         # Add feeds by category
         added_count = 0
-        for category in ['Tech', 'Distributed', 'Read']:
+        for category in ['Programming', 'JavaSpring', 'Engineering']:
             if category in feeds_by_category:
                 for feed in feeds_by_category[category]:
                     url = feed['xmlUrl']
@@ -199,55 +200,9 @@ class FeedlyImporter:
                     else:
                         self.skipped_feeds.append(feed['title'])
 
-        # Write updated config
+        # Write updated config using proper YAML
         with open(self.config_path, 'w') as f:
-            # Write header comment
-            f.write("# Pi Display Configuration File\n")
-            f.write("# Auto-updated by import_feedly.py\n")
-            f.write(f"# Last modified: {datetime.now().isoformat()}\n\n")
-
-            # Write config, but we need to manually handle the rss_feeds list
-            # to add inline comments
-            for key, value in config.items():
-                if key == 'news':
-                    f.write(f"{key}:\n")
-                    for subkey, subvalue in value.items():
-                        if subkey == 'rss_feeds':
-                            f.write(f"  {subkey}:\n")
-
-                            # Write feeds with category comments
-                            current_category = None
-                            for url in subvalue:
-                                # Find which category this feed belongs to
-                                feed_info = next((f for f in self.imported_feeds if f['xmlUrl'] == url), None)
-
-                                if feed_info:
-                                    feed_category = feed_info['category']
-
-                                    # Add category comment if new category
-                                    if feed_category != current_category:
-                                        if current_category is not None:
-                                            f.write("\n")
-
-                                        category_desc = {
-                                            'Tech': 'General tech news',
-                                            'Distributed': 'Cloud/microservices',
-                                            'Read': 'Java/Spring development'
-                                        }.get(feed_category, feed_category)
-
-                                        f.write(f"    # Imported from Feedly - {feed_category} ({category_desc})\n")
-                                        current_category = feed_category
-
-                                    # Write feed with inline comment
-                                    f.write(f'    - "{url}"  # {feed_info["title"]}\n')
-                                else:
-                                    # Existing feed (not from import)
-                                    f.write(f'    - "{url}"\n')
-                        else:
-                            f.write(f"  {subkey}: {yaml.dump(subvalue, default_flow_style=False).strip()}\n")
-                else:
-                    f.write(f"{key}: {yaml.dump(value, default_flow_style=False).strip()}\n")
-                f.write("\n")
+            yaml.dump(config, f, default_flow_style=False, sort_keys=False)
 
         print(f"✓ Added {added_count} new feeds")
         if self.skipped_feeds:

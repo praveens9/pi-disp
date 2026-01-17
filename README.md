@@ -101,6 +101,46 @@ display:
   rotation_interval: 30  # seconds between content changes
 ```
 
+## Importing RSS Feeds from Feedly
+
+If you use Feedly to manage your RSS subscriptions, you can easily import your feeds:
+
+### Step 1: Export from Feedly
+1. Go to [Feedly](https://feedly.com)
+2. Click on your profile (bottom left)
+3. Select "Organize Sources" → "OPML"
+4. Click "Download" to save your subscriptions
+
+### Step 2: Import to Pi Display
+```bash
+# Run the import script with your OPML file
+python scripts/import_feedly.py path/to/your-feedly-export.opml
+```
+
+The script will:
+- Parse your Feedly OPML export
+- Import curated tech feeds (15 feeds from Tech, Cloud/Distributed, and Java/Spring categories)
+- Create a backup of your existing config
+- Update `config/config.yaml` with organized, commented feed list
+
+### Example Output
+```
+✓ Found 86 feeds in OPML
+📋 Importing 15 curated feeds
+✓ Added 15 new feeds
+📁 Config updated: config/config.yaml
+```
+
+Your `config.yaml` will be updated with feeds organized by category:
+```yaml
+news:
+  rss_feeds:
+    # Imported from Feedly - Tech (General tech news)
+    - "http://feeds.feedburner.com/Techcrunch"  # TechCrunch
+    - "http://news.ycombinator.com/rss"  # Hacker News
+    # ... more feeds with inline comments
+```
+
 ## Getting API Keys
 
 ### OpenWeatherMap (Required)

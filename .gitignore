@@ -1,8 +1,12 @@
 # API keys and secrets - NEVER commit these!
 config/config.yaml
+config/*.backup*.yaml
 .env
 credentials.json
 token.json
+
+# Personal data files
+*.opml
 
 # Cache and data
 data/cache.db

@@ -1,0 +1,180 @@
+# Pi Display Configuration File
+# ==============================
+#
+# This file contains all configuration settings for the Pi Display project.
+#
+# IMPORTANT: Copy this file to 'config.yaml' and fill in your actual values
+#     cp config/config.yaml.example config/config.yaml
+#
+# SECURITY: Never commit config.yaml to git - it contains your API keys!
+#           The .gitignore file is configured to exclude it.
+#
+
+# Weather Configuration
+# ----------------------
+weather:
+  # OpenWeatherMap API key (required)
+  # Get your free key at: https://openweathermap.org/api
+  # Free tier includes: 1,000 calls/day, 60 calls/minute
+  api_key: "YOUR_OPENWEATHERMAP_API_KEY_HERE"
+
+  # Your location coordinates
+  # Find yours at: https://www.latlong.net/
+  # New York City example:
+  latitude: 40.7128
+  longitude: -74.0060
+
+  # Units: 'metric' (Celsius), 'imperial' (Fahrenheit), or 'standard' (Kelvin)
+  units: "imperial"
+
+  # Cache duration in seconds (default: 30 minutes = 1800 seconds)
+  # Weather doesn't change that often, so we don't need frequent updates
+  cache_duration: 1800
+
+
+# News Configuration
+# ------------------
+news:
+  # RSS feed URLs
+  # Add as many feeds as you like
+  # Popular options:
+  #   - BBC: https://feeds.bbci.co.uk/news/rss.xml
+  #   - NY Times: https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+  #   - TechCrunch: https://techcrunch.com/feed/
+  #   - Hacker News: https://news.ycombinator.com/rss (or use our HN API integration)
+  rss_feeds:
+    - "https://feeds.bbci.co.uk/news/rss.xml"
+    - "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+
+  # Reddit configuration (Session 10)
+  # Get credentials at: https://www.reddit.com/prefs/apps
+  reddit:
+    enabled: false  # Set to true when you have credentials
+    client_id: "YOUR_REDDIT_CLIENT_ID"
+    client_secret: "YOUR_REDDIT_CLIENT_SECRET"
+    user_agent: "pi-display:v1.0 (by /u/YOUR_REDDIT_USERNAME)"
+
+    # Subreddits to fetch from
+    subreddits:
+      - "worldnews"
+      - "technology"
+      - "science"
+
+    # Number of top posts to fetch from each subreddit
+    limit: 5
+
+  # Twitter configuration (optional - API access is limited)
+  twitter:
+    enabled: false  # Twitter API is currently restricted/paid
+    # If you have access, add credentials here
+
+  # Hacker News (no API key needed!)
+  hackernews:
+    enabled: true
+    # Number of top stories to fetch
+    limit: 10
+
+  # Cache duration in seconds (default: 15 minutes = 900 seconds)
+  cache_duration: 900
+
+
+# Quotes Configuration
+# --------------------
+quotes:
+  # Quote source API
+  # Options: 'zenquotes' (free, no key needed), 'quotable' (free, no key needed)
+  source: "zenquotes"
+
+  # Categories (if supported by API)
+  # Examples: inspirational, motivational, life, success, happiness
+  categories:
+    - "inspirational"
+    - "success"
+
+  # Cache duration in seconds (default: 24 hours = 86400 seconds)
+  # Quotes don't change often, so we can cache for a full day
+  cache_duration: 86400
+
+
+# Photos Configuration (Session 11)
+# ----------------------------------
+photos:
+  # Google Photos OAuth
+  # Setup instructions in PLAN.md - Session 11
+  google:
+    enabled: false  # Set to true after OAuth setup
+    credentials_file: "credentials.json"  # Download from Google Cloud Console
+    token_file: "token.json"              # Generated after first auth
+
+    # Album to fetch from (leave empty for all photos)
+    album_name: ""
+
+    # Number of photos to fetch in rotation
+    limit: 20
+
+  # Alternative: NASA Astronomy Picture of the Day
+  nasa_apod:
+    enabled: false
+    api_key: "YOUR_NASA_API_KEY"  # Get from: https://api.nasa.gov/
+
+  # Cache duration in seconds (default: 1 hour = 3600 seconds)
+  cache_duration: 3600
+
+
+# Display Configuration
+# ----------------------
+display:
+  # Content rotation interval in seconds
+  # How long each piece of content (news, quote, photo) stays on screen
+  rotation_interval: 30
+
+  # Items to show in rotation
+  # Set to false to disable any content type
+  show_news: true
+  show_quotes: true
+  show_photos: true
+
+  # Number of news items to show before rotating to other content
+  news_items_per_cycle: 3
+
+
+# Application Settings
+# --------------------
+app:
+  # Application name (shown in logs and API responses)
+  name: "Pi Display"
+
+  # Version (update when making changes)
+  version: "1.0.0-dev"
+
+  # Timezone
+  # List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  # Examples: 'America/New_York', 'Europe/London', 'Asia/Tokyo'
+  timezone: "America/New_York"
+
+  # Logging level
+  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  # DEBUG shows everything, ERROR only shows errors
+  log_level: "INFO"
+
+
+# Future: Voice Assistant Configuration (Phase 3)
+# ------------------------------------------------
+voice:
+  enabled: false  # Will be implemented in future sessions
+
+  # Google Assistant SDK
+  google_assistant:
+    credentials_file: "assistant_credentials.json"
+
+  # LLM for query processing
+  llm:
+    provider: "anthropic"  # Options: 'anthropic', 'openai', 'local'
+    api_key: "YOUR_LLM_API_KEY"
+    model: "claude-3-5-sonnet-20241022"  # or 'gpt-4', etc.
+
+    # Maximum tokens for responses
+    max_tokens: 500
+
+    # Temperature (0.0 = focused, 1.0 = creative)
+    temperature: 0.7

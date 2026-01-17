@@ -164,25 +164,37 @@ pi-display/
 
 This project follows a 14-session development plan designed for beginners. See [PLAN.md](PLAN.md) for the complete roadmap.
 
-### Current Session: SESSION 1
-- [x] Project structure
-- [x] Documentation (PLAN.md, README.md, .gitignore)
-- [ ] Flask backend foundation
-- [ ] Configuration system
-- [ ] First test endpoint
+### Current Session: SESSION 2
+- [x] SESSION 1: Project foundation complete
+- [x] SQLite caching system
+- [x] OpenWeatherMap integration
+- [x] `/api/weather` endpoint
+- [ ] Full testing with real API
+- [ ] Next: News aggregation (SESSION 3)
 
 ### Testing
 ```bash
-# Test backend
-cd backend
-python app.py
-# Visit http://localhost:5000/api/health
+# Test backend (with virtual environment)
+source venv/bin/activate
+python backend/app.py
 
 # Test all endpoints
-curl http://localhost:5000/api/weather
-curl http://localhost:5000/api/news
-curl http://localhost:5000/api/quote
+curl http://localhost:5000/api/health
 curl http://localhost:5000/api/time
+curl http://localhost:5000/api/weather  # Requires API key in config
+
+# Weather endpoint example response:
+# {
+#   "temperature": 72.5,
+#   "feels_like": 70.2,
+#   "condition": "Clear",
+#   "description": "clear sky",
+#   "humidity": 45,
+#   "pressure": 1013,
+#   "wind_speed": 5.2,
+#   "location": "New York",
+#   "country": "US"
+# }
 ```
 
 ## Deployment on Raspberry Pi

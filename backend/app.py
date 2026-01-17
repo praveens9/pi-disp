@@ -25,6 +25,9 @@ from pathlib import Path
 # This lets us access config.get('weather.api_key') etc.
 from config import config
 
+# Import data fetchers
+from data_fetchers.weather import get_current_weather, WeatherError
+
 # Create the Flask application
 # __name__ tells Flask where to find resources (templates, static files)
 app = Flask(__name__)
@@ -98,8 +101,56 @@ def get_time():
     })
 
 
+@app.route('/api/weather')
+def get_weather():
+    """
+    Returns current weather data from OpenWeatherMap.
+
+    Clean Code Principles:
+    - Single Responsibility: Routing only, delegates to weather fetcher
+    - Proper error handling: Different HTTP codes for different errors
+    - Clear response format: Consistent JSON structure
+
+    Returns:
+        JSON with weather data
+
+    HTTP Status Codes:
+        200: Success
+        500: Server error (API failure, configuration error)
+
+    Example:
+        GET http://localhost:5000/api/weather
+        Response: {
+            "temperature": 72.5,
+            "condition": "Clear",
+            "description": "clear sky",
+            "humidity": 45,
+            "wind_speed": 5.2,
+            ...
+        }
+    """
+    try:
+        # Delegate to weather fetcher (Dependency Inversion Principle)
+        weather_data = get_current_weather()
+        return jsonify(weather_data)
+
+    except WeatherError as e:
+        # Handle weather-specific errors with clear messages
+        return jsonify({
+            'error': 'Weather fetch failed',
+            'message': str(e),
+            'suggestion': 'Check your API key and network connection'
+        }), 500
+
+    except Exception as e:
+        # Catch unexpected errors
+        return jsonify({
+            'error': 'Unexpected error',
+            'message': str(e)
+        }), 500
+
+
 # Future endpoints will be added in later sessions:
-# @app.route('/api/weather')  - Session 2
 # @app.route('/api/news')     - Session 3
 # @app.route('/api/quote')    - Session 4
 # @app.route('/api/photo')    - Session 11
@@ -122,7 +173,8 @@ def not_found(error):
         'message': 'The requested API endpoint does not exist',
         'available_endpoints': [
             '/api/health',
-            '/api/time'
+            '/api/time',
+            '/api/weather'
         ]
     }), 404
 
@@ -159,8 +211,9 @@ def print_startup_info():
     print("=" * 60)
     print(f"\n✓ Flask server running on http://localhost:5000")
     print(f"\n📍 Available endpoints:")
-    print(f"   • http://localhost:5000/api/health  - Health check")
-    print(f"   • http://localhost:5000/api/time    - Current time")
+    print(f"   • http://localhost:5000/api/health   - Health check")
+    print(f"   • http://localhost:5000/api/time     - Current time")
+    print(f"   • http://localhost:5000/api/weather  - Weather data")
     print(f"\n⚙️  Configuration:")
 
     # Check if config is loaded

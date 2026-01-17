@@ -164,13 +164,14 @@ pi-display/
 
 This project follows a 14-session development plan designed for beginners. See [PLAN.md](PLAN.md) for the complete roadmap.
 
-### Current Session: SESSION 2
+### Current Session: SESSION 3
 - [x] SESSION 1: Project foundation complete
-- [x] SQLite caching system
-- [x] OpenWeatherMap integration
-- [x] `/api/weather` endpoint
-- [ ] Full testing with real API
-- [ ] Next: News aggregation (SESSION 3)
+- [x] SESSION 2: Weather + caching complete
+- [x] News aggregation system (RSS + Hacker News)
+- [x] `/api/news` endpoint with configurable limit
+- [x] Clean architecture (SOLID, KISS, DRY principles)
+- [x] All tests passing
+- [ ] Next: Quotes & Time enhancement (SESSION 4)
 
 ### Testing
 ```bash
@@ -182,6 +183,8 @@ python backend/app.py
 curl http://localhost:5000/api/health
 curl http://localhost:5000/api/time
 curl http://localhost:5000/api/weather  # Requires API key in config
+curl http://localhost:5000/api/news     # Fetches from RSS + Hacker News
+curl "http://localhost:5000/api/news?limit=5"  # Limit to 5 articles
 
 # Weather endpoint example response:
 # {
@@ -195,6 +198,24 @@ curl http://localhost:5000/api/weather  # Requires API key in config
 #   "location": "New York",
 #   "country": "US"
 # }
+
+# News endpoint example response:
+# [
+#   {
+#     "title": "Drone Hacking Part 1: Dumping Firmware...",
+#     "link": "https://neodyme.io/en/blog/drone_hacking_part_1/",
+#     "source": "HackerNews",
+#     "published": "2026-01-17T08:05:28",
+#     "description": ""
+#   },
+#   {
+#     "title": "Who else has been named to join Trump...",
+#     "link": "https://www.bbc.com/news/articles/c9vx7kn33elo",
+#     "source": "RSS: bbci",
+#     "published": "2026-01-17T06:07:56",
+#     "description": "The White House has released the names..."
+#   }
+# ]
 ```
 
 ## Deployment on Raspberry Pi
@@ -291,16 +312,19 @@ For more issues, see [PLAN.md - Troubleshooting section](PLAN.md#common-issues--
        │   refresh)──────────┘
        │
        └─ External APIs
-          ├─ OpenWeatherMap
-          ├─ RSS Feeds
-          ├─ Hacker News
-          ├─ Reddit
-          └─ Google Photos
+          ├─ OpenWeatherMap ✓
+          ├─ RSS Feeds ✓
+          ├─ Hacker News ✓
+          ├─ Reddit (SESSION 10)
+          └─ Google Photos (SESSION 11)
 ```
 
 ## Future Roadmap
 
-- [ ] **Session 2-4**: Complete backend data fetchers
+- [x] **Session 1**: Project foundation and Flask setup
+- [x] **Session 2**: Weather + SQLite caching system
+- [x] **Session 3**: News aggregation (RSS + Hacker News)
+- [ ] **Session 4**: Quotes & enhanced time endpoint
 - [ ] **Session 5-7**: Build responsive frontend
 - [ ] **Session 8-9**: Background scheduler and setup scripts
 - [ ] **Session 10-11**: Reddit and Google Photos integration

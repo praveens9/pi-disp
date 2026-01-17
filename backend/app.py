@@ -15,7 +15,7 @@ Why Flask?
 - Flexible: Can add features as we need them
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from datetime import datetime
 import sys
@@ -27,6 +27,7 @@ from config import config
 
 # Import data fetchers
 from data_fetchers.weather import get_current_weather, WeatherError
+from data_fetchers.news import get_current_news, NewsError
 
 # Create the Flask application
 # __name__ tells Flask where to find resources (templates, static files)
@@ -150,8 +151,68 @@ def get_weather():
         }), 500
 
 
+@app.route('/api/news')
+def get_news():
+    """
+    Returns aggregated news from multiple sources (RSS, Hacker News).
+
+    Clean Code Principles:
+    - Single Responsibility: Routing only, delegates to news aggregator
+    - Proper error handling: Different HTTP codes for different errors
+    - Clear response format: Consistent JSON array structure
+
+    Returns:
+        JSON array of news articles
+
+    HTTP Status Codes:
+        200: Success
+        500: Server error (API failure, configuration error)
+
+    Example:
+        GET http://localhost:5000/api/news?limit=20
+        Response: [
+            {
+                "title": "Breaking news headline",
+                "link": "https://...",
+                "source": "RSS: BBC",
+                "published": "2026-01-17T10:30:00",
+                "description": "Article summary..."
+            },
+            ...
+        ]
+    """
+    try:
+        # Get limit from query parameter (default: 10)
+        limit = request.args.get('limit', default=10, type=int)
+
+        # Validate limit
+        if limit < 1 or limit > 100:
+            return jsonify({
+                'error': 'Invalid limit',
+                'message': 'Limit must be between 1 and 100'
+            }), 400
+
+        # Delegate to news aggregator (Dependency Inversion Principle)
+        news_data = get_current_news(limit=limit)
+        return jsonify(news_data)
+
+    except NewsError as e:
+        # Handle news-specific errors with clear messages
+        return jsonify({
+            'error': 'News fetch failed',
+            'message': str(e),
+            'suggestion': 'Check your network connection and RSS feed URLs'
+        }), 500
+
+    except Exception as e:
+        # Catch unexpected errors
+        return jsonify({
+            'error': 'Unexpected error',
+            'message': str(e)
+        }), 500
+
+
 # Future endpoints will be added in later sessions:
-# @app.route('/api/news')     - Session 3
 # @app.route('/api/quote')    - Session 4
 # @app.route('/api/photo')    - Session 11
 
@@ -174,7 +235,8 @@ def not_found(error):
         'available_endpoints': [
             '/api/health',
             '/api/time',
-            '/api/weather'
+            '/api/weather',
+            '/api/news'
         ]
     }), 404
 
@@ -214,6 +276,7 @@ def print_startup_info():
     print(f"   • http://localhost:5000/api/health   - Health check")
     print(f"   • http://localhost:5000/api/time     - Current time")
     print(f"   • http://localhost:5000/api/weather  - Weather data")
+    print(f"   • http://localhost:5000/api/news     - News aggregation")
     print(f"\n⚙️  Configuration:")
 
     # Check if config is loaded
